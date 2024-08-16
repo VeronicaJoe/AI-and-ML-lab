@@ -1,0 +1,48 @@
+% solve(Node, Solution) - Find an acyclic path (in reverse order) from Node to a goal
+solve(Node, Solution) :-
+    depthfirst([], Node, Solution).
+
+% depthfirst(Path, Node, Solution)
+% Extending the path [Node | Path] to a goal gives Solution
+depthfirst(Path, Node, [Node | Path]) :-
+    goal(Node).
+
+depthfirst(Path, Node, Sol) :-
+    s(Node, Node1),
+    \+ member(Node1, Path), % Prevent a cycle
+    depthfirst([Node | Path], Node1, Sol).
+
+% depthfirst2(Node, Solution, Maxdepth)
+% Perform depth-limited search with depth Maxdepth
+depthfirst2(Node, [Node], _) :-
+    goal(Node).
+
+depthfirst2(Node, [Node | Sol], Maxdepth) :-
+    Maxdepth > 0,
+    s(Node, Node1),
+    Max1 is Maxdepth - 1,
+    depthfirst2(Node1, Sol, Max1).
+
+% Example definitions (for completeness)
+% Define the goal node
+goal(goal_node).
+
+% Define the graph
+s(start_node, node1).
+s(node1, node2).
+s(node2, goal_node).
+
+% Initialization Directive
+:- initialization(main).
+
+% Main Predicate for Testing
+main :-
+    % Test the depth-first search
+    solve(start_node, Solution1),
+    format('Depth-First Search Solution: ~w~n', [Solution1]),
+
+    % Test the depth-limited search with a maximum depth of 3
+    depthfirst2(start_node, Solution2, 3),
+    format('Depth-Limited Search Solution (depth 3): ~w~n', [Solution2]),
+
+    halt. % Ensure the program halts after execution
